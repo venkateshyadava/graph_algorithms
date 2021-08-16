@@ -8,19 +8,13 @@ class Graph:
     def insert(self, vertex, edge):
         self.gdict[vertex] = edge
 
+    def dfs_util(self, visited, node):
+        if node not in visited:
+            print(node)
+            visited.add(node)
+            for neighbour in self.gdictgraph[node]:
+                self.dfs(visited, neighbour)
+
     def dfs(self, vertex):
-        traversal = []
-        stack = []
         visited = []
-        stack.append(vertex)
-        visited.append(vertex)
-
-        def dfs_util(vertex):
-            nonlocal traversal, stack, visited
-            curr_vertex = stack.pop()
-            for neighbors in self.gdict[curr_vertex]:
-                if neighbors not in visited:
-                    traversal.append(curr_vertex)
-                    dfs_util(neighbors)
-
-        return traversal
+        self.dfs_util(visited, vertex)
