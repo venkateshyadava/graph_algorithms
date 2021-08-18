@@ -1,23 +1,46 @@
-class DisjointSet:
-    def __init__(self, vertices):
-        self.parents = {}
-        for i in vertices:
-            self.parents[i] = i
-        self.rank = dict.fromkeys(vertices, 0)
+### Copied from : https://gist.github.com/artkpv/6f0591c01a940d6ebe1344a8efa88847
 
-    def find(self, vertex):
-        while self.parents[vertex] != vertex:
-            vertex = self.parents[vertex]
 
-    def union(self, x, y):
-        xroot = self.find(x)
-        yroot = self.find(y)
+class UnionFind:
+    """Weighted quick-union with path compression and connected components.
+    The original Java implementation is introduced at
+    https://www.cs.princeton.edu/~rs/AlgsDS07/01UnionFind.pdf
+    >>> uf = UnionFind(10)
+    >>> for (p, q) in [(3, 4), (4, 9), (8, 0), (2, 3), (5, 6), (5, 9),
+    ...                (7, 3), (4, 8), (6, 1)]:
+    ...     uf.union(p, q)
+    >>> uf._id
+    [8, 3, 3, 3, 3, 3, 3, 3, 3, 3]
+    >>> uf.find(0, 1)
+    True
+    >>> uf._id
+    [3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
+    """
 
-        if self.rank[xroot] < self.rank[yroot]:
-            self.parent[xroot] = yroot
-        elif self.rank[xroot] > self.rank[yroot]:
-            self.parent[yroot] = xroot
+    def __init__(self, n):
+        self._id = list(range(n))
+        self._sz = [1] * n
+        self.cc = n  # connected components
+
+    def _root(self, i):
+        j = i
+        while j != self._id[j]:
+            self._id[j] = self._id[self._id[j]]
+            j = self._id[j]
+        return j
+
+    def find(self, p, q):
+        return self._root(p) == self._root(q)
+
+    def union(self, p, q):
+        i = self._root(p)
+        j = self._root(q)
+        if i == j:
+            return
+        if self._sz[i] < self._sz[j]:
+            self._id[i] = j
+            self._sz[j] += self._sz[i]
         else:
-            self.parents[yroot] = xroot
-            self.rank[xroot] += 1
-
+            self._id[j] = i
+            self._sz[i] += self._sz[j]
+        self.cc -= 1
